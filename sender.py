@@ -25,7 +25,7 @@ class FrameSegment(object):
         Compress image and Break down
         into data segments 
         """
-        compress_img = cv2.imencode('.jpg', img)[1]
+        compress_img = cv2.imencode('.jpg', img, [cv2.IMWRITE_JPEG_QUALITY, 50])[1]
         dat = compress_img.tostring()
         size = len(dat)
         count = math.ceil(size/(self.MAX_IMAGE_DGRAM))
@@ -48,9 +48,11 @@ def main():
 
     fs = FrameSegment(s, port)
 
-    cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture(1)
     while (cap.isOpened()):
         _, frame = cap.read()
+        # force resize to 640x360
+        frame = cv2.resize(frame, (640, 360), interpolation=cv2.INTER_AREA)
         fs.udp_frame(frame)
     cap.release()
     cv2.destroyAllWindows()
